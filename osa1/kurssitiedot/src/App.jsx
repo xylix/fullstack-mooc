@@ -1,34 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+const Header = ({course}) => (
+    <h1>{course}</h1>
+)
 
-function App() {
-  const [count, setCount] = useState(0)
+const Total = ({parts}) => {
+  console.log(parts)
+  const amount = parts.reduce((accum, current) => accum + current, 0)
+  return <p>Number of exercises {amount}</p>
+}
+
+const Content = ({ parts, exercise_counts }) => {
+  return <div>
+    <Part name={parts[0]} exercises={exercise_counts[0]} />
+    <Part name={parts[1]} exercises={exercise_counts[1]} />
+    <Part name={parts[2]} exercises={exercise_counts[2]} />
+  </div>
+
+}
+const Part = ({name, exercises}) => {
+  return <p>
+    {name} {exercises}
+  </p>
+}
+
+const App = () => {
+  const course = 'Half Stack application development'
+  const part1 = 'Fundamentals of React'
+  const exercises1 = 10
+  const part2 = 'Using props to pass data'
+  const exercises2 = 7
+  const part3 = 'State of a component'
+  const exercises3 = 14
+  const parts = [part1, part2, part3]
+  const exercise_counts = [exercises1, exercises2, exercises3]
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div>
+      <Header course={course} />
+      <Content parts={parts} exercise_counts={exercise_counts} />
+      <Total parts={exercise_counts} />
+    </div>
   )
 }
 
