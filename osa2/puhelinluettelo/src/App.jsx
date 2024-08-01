@@ -8,6 +8,10 @@ const App = () => {
 
   const submit = (event) => {
     event.preventDefault()
+    if (persons.some(p => p.name === newName)) {
+      alert(`${newName} already added to phonebook`)
+      return
+    }
     // console.log(persons)
     // console.log(event.target)
     setPersons(persons.concat({name: newName}))
@@ -34,6 +38,7 @@ const App = () => {
         {persons.map(person => (
             <div key={person.name}>{person.name}</div>
         ))}
+      {/* <div>debug: {newName}</div> */}
     </div>
   )
 
