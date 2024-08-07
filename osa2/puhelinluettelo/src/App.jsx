@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import './style.css'
 import { createPerson, getPersons, deletePerson, updatePerson } from './database'
 
 const Filter = ({onChange}) => (
@@ -20,10 +21,23 @@ const Persons = ({personsToShow, handleDelete}) => (
   ))
 )
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div id="notif" className="notif">
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
@@ -34,22 +48,28 @@ const App = () => {
   const submit = (event) => {
     event.preventDefault()
     const oldPerson = persons.find(p => p.name === newName)
-    if (oldPerson) {
+    if (oldPerson && oldPerson.name) {
       if (window.confirm(`Update phone number for ${oldPerson.name}?`)) {
         oldPerson['number'] = newNumber
         updatePerson(oldPerson)
-        setNewName('')
+        setNotificationMessage(`Updated number of ${oldPerson.name} to ${newNumber}`)
+        setTimeout(() => setNotificationMessage(null), 3000)
+        setNewName()
         setNewNumber('')
         return
       } else {
         return
       }
     }
+    if (!newName) return
     const personObject = {name: newName, number: newNumber}
     // console.log(persons)
     // console.log(event.target)
     setPersons(persons.concat(personObject))
-    createPerson(personObject)
+    createPerson(personObject).then(() => {
+      setNotificationMessage(`Created new person ${personObject.name}`)
+      setTimeout(() => setNotificationMessage(null), 3000)
+    })
 
     setNewName('')
     setNewNumber('')
@@ -70,6 +90,9 @@ const App = () => {
     if (window.confirm(`Delete ${person.name}?`)) {
       deletePerson(person.id)
       setPersons(persons.filter(p => p.id !== person.id))
+      console.log("setting delete notif message")
+      setNotificationMessage(`Deleted ${person.name}`)
+      setTimeout(() => setNotificationMessage(null), 3000)
     }
   }
   const personsToShow = persons.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()))
@@ -77,6 +100,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} />
       <Filter onChange={handleFilterChange}/>
       <h4>Add a new</h4>
       <PersonForm onSubmit={submit} onNameChange={handleNameChange} onNumberChange={handleNumberChange}/>
