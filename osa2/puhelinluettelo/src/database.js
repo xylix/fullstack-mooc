@@ -1,11 +1,19 @@
 import axios from 'axios'
+const baseUrl = 'http://localhost:3001/persons'
 
 const createPerson = (personObject) => {
-  axios
-      .post('http://localhost:3001/persons', personObject)
-        .then(response => {
-          console.log(response)
-      })
+  const request = axios.post(baseUrl, personObject)
+  return request.then(response => {
+    console.log(response)
+  })
 }
 
-export {createPerson}
+const getPersons = () => {
+  const request = axios.get(baseUrl)
+  return request.then(response => {
+    console.log('promise fulfilled')
+    return response.data
+  })
+}
+
+export {createPerson, getPersons}
