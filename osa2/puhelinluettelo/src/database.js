@@ -16,4 +16,9 @@ const getPersons = () => {
   })
 }
 
-export {createPerson, getPersons}
+const deletePerson = (id) => {
+  const request = axios.delete(`${baseUrl}/${id}`)
+  return request.then(response => console.log('deleted'))
+}
+
+export {createPerson, getPersons, deletePerson}

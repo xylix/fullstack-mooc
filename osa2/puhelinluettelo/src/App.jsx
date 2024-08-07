@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createPerson, getPersons } from './database'
+import { createPerson, getPersons, deletePerson } from './database'
 
 const Filter = ({onChange}) => (
  <div>filter shown with <input onChange={onChange}/></div>
@@ -14,9 +14,9 @@ const PersonForm = ({ onSubmit, onNameChange, onNumberChange}) => (
     </div>
   </form>
 )
-const Persons = ({personsToShow}) => (
+const Persons = ({personsToShow, handleDelete}) => (
   personsToShow.map(person => (
-    <div key={person.name}>{person.name} {person.number}</div>
+    <div key={person.name}>{person.name} {person.number} <button onClick={ () => handleDelete(person) } title="Delete">Delete</button></div>
   ))
 )
 
@@ -57,6 +57,11 @@ const App = () => {
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
   }
+  const handleDelete = (person) => {
+    window.confirm(`Delete ${person.name}?`)
+    deletePerson(person.id)
+    setPersons(persons.filter(p => p.id !== person.id))
+  }
   const personsToShow = persons.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()))
 
   return (
@@ -67,7 +72,7 @@ const App = () => {
       <PersonForm onSubmit={submit} onNameChange={handleNameChange} onNumberChange={handleNumberChange}/>
 
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} handleDelete={handleDelete} />
       {/* <div>debug: {newName}</div> */}
     </div>
   )
