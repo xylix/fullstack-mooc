@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { createPerson } from './database'
 
 const Filter = ({onChange}) => (
  <div>filter shown with <input onChange={onChange}/></div>
@@ -41,9 +42,12 @@ const App = () => {
       alert(`${newName} already added to phonebook`)
       return
     }
+    const personObject = {name: newName, number: newNumber}
     // console.log(persons)
     // console.log(event.target)
-    setPersons(persons.concat({name: newName, number: newNumber}))
+    setPersons(persons.concat(personObject))
+    createPerson(personObject)
+
     setNewName('')
     // console.log(persons)
   }
