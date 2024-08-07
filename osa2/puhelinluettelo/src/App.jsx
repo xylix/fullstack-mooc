@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createPerson, getPersons, deletePerson } from './database'
+import { createPerson, getPersons, deletePerson, updatePerson } from './database'
 
 const Filter = ({onChange}) => (
  <div>filter shown with <input onChange={onChange}/></div>
@@ -33,9 +33,17 @@ const App = () => {
 
   const submit = (event) => {
     event.preventDefault()
-    if (persons.some(p => p.name === newName)) {
-      alert(`${newName} already added to phonebook`)
-      return
+    const oldPerson = persons.find(p => p.name === newName)
+    if (oldPerson) {
+      if (window.confirm(`Update phone number for ${oldPerson.name}?`)) {
+        oldPerson['number'] = newNumber
+        updatePerson(oldPerson)
+        setNewName('')
+        setNewNumber('')
+        return
+      } else {
+        return
+      }
     }
     const personObject = {name: newName, number: newNumber}
     // console.log(persons)
@@ -44,6 +52,7 @@ const App = () => {
     createPerson(personObject)
 
     setNewName('')
+    setNewNumber('')
     // console.log(persons)
   }
 
@@ -58,9 +67,10 @@ const App = () => {
     setFilter(event.target.value)
   }
   const handleDelete = (person) => {
-    window.confirm(`Delete ${person.name}?`)
-    deletePerson(person.id)
-    setPersons(persons.filter(p => p.id !== person.id))
+    if (window.confirm(`Delete ${person.name}?`)) {
+      deletePerson(person.id)
+      setPersons(persons.filter(p => p.id !== person.id))
+    }
   }
   const personsToShow = persons.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()))
 
