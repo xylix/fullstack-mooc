@@ -27,7 +27,19 @@ const Notification = ({ message }) => {
   }
 
   return (
-    <div id="notif" className="notif">
+    <div className="notif">
+      {message}
+    </div>
+  )
+}
+
+const Error = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="error">
       {message}
     </div>
   )
@@ -38,6 +50,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [notificationMessage, setNotificationMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
@@ -88,11 +101,15 @@ const App = () => {
   }
   const handleDelete = (person) => {
     if (window.confirm(`Delete ${person.name}?`)) {
-      deletePerson(person.id)
+      deletePerson(person.id).then(() => {
+        console.log("setting delete notif message")
+        setNotificationMessage(`Deleted ${person.name}`)
+        setTimeout(() => setNotificationMessage(null), 3000)
+      }).catch(() => {
+        setErrorMessage(`Information of ${person.name} has been removed from the server`)
+        setTimeout(() => setErrorMessage(null), 3000)
+      })
       setPersons(persons.filter(p => p.id !== person.id))
-      console.log("setting delete notif message")
-      setNotificationMessage(`Deleted ${person.name}`)
-      setTimeout(() => setNotificationMessage(null), 3000)
     }
   }
   const personsToShow = persons.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()))
@@ -100,6 +117,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Error message={errorMessage}/>
       <Notification message={notificationMessage} />
       <Filter onChange={handleFilterChange}/>
       <h4>Add a new</h4>
