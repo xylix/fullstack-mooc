@@ -1,12 +1,24 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const weatherCall = (lat, long) => {
+  return axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,wind_speed_10m`)
+}
 
 const Filter = ({onChange}) => (
  <div>Find countries <input onChange={onChange}/></div>
 )
 
-const FilteredCountries = ({filter, setFilter, countryData}) => {
+const FilteredCountries = ({filter, setFilter, countryData, country, setCountry, weatherData, setWeatherData}) => {
+  useEffect(() => {
+    if (country) {
+      weatherCall(country.latlng[0], country.latlng[1]).then(w => {
+        setWeatherData(w.data)
+        console.log(w)
+      })
+    }
+  }, [country])
+
   if (!countryData) return
   if (!filter) return "Too many matches specify another filter"
 
@@ -14,9 +26,10 @@ const FilteredCountries = ({filter, setFilter, countryData}) => {
   Object.keys(countryData).forEach((key, index) => {
     if (key.toLowerCase().includes(filter.toLowerCase())) countryList.push(countryData[key])
   })
+  setCountry(countryList[0])
   if (countryList.length === 1) {
+    const c = countryList[0]
 
-    const country = countryList[0]
     return <div>
       <h3>{country.name.common}</h3>
       capital: {country.capital[0]}
@@ -28,6 +41,9 @@ const FilteredCountries = ({filter, setFilter, countryData}) => {
         {Object.values(country.languages).map(lang => <li key={lang}>{lang}</li>)}
       </ul>
       <img src={country.flags.png} />
+      <div>temp: {weatherData && weatherData.current.temperature_2m} °C</div>
+      <br/>
+      <div>wind: {weatherData && weatherData.current.wind_speed_10m} m/s</div>
     </div>
   }
   return <div>
@@ -39,6 +55,8 @@ const FilteredCountries = ({filter, setFilter, countryData}) => {
 function App() {
   const [countryData, setCountryData] = useState(null)
   const [filter, setFilter] = useState("")
+  const [country, setCountry] = useState("")
+  const [weatherData, setWeatherData] = useState(null)
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
@@ -55,14 +73,20 @@ function App() {
         parsedCountryData[countryName] = rawData[key]
       })
       setCountryData(parsedCountryData)
-      console.log(parsedCountryData)
     })
   }, [])
 
   return (
     <>
       <Filter onChange={handleFilterChange} />
-      <FilteredCountries filter={filter} countryData={countryData} setFilter={setFilter}/>
+      <FilteredCountries
+        filter={filter}
+        countryData={countryData}
+        setFilter={setFilter}
+        country={country}
+        setCountry={setCountry}
+        weatherData={weatherData}
+        setWeatherData={setWeatherData}/>
     </>
   )
 }
