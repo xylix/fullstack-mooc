@@ -6,7 +6,7 @@ const Filter = ({onChange}) => (
  <div>Find countries <input onChange={onChange}/></div>
 )
 
-const FilteredCountries = ({filter, countryData}) => {
+const FilteredCountries = ({filter, setFilter, countryData}) => {
   if (!countryData) return
   if (!filter) return "Too many matches specify another filter"
 
@@ -25,13 +25,13 @@ const FilteredCountries = ({filter, countryData}) => {
 
       <h3>languages:</h3>
       <ul>
-        {Object.values(country.languages).map(lang => <li>{lang}</li>)}
+        {Object.values(country.languages).map(lang => <li key={lang}>{lang}</li>)}
       </ul>
       <img src={country.flags.png} />
     </div>
   }
   return <div>
-    {countryList.map(c => <p key={c.name.common}>{c.name.common}</p>)}
+    {countryList.map(c => <p key={c.name.common}>{c.name.common}<button onClick={() => setFilter(c.name.common)}>show</button></p>)}
   </div>
 
 }
@@ -62,7 +62,7 @@ function App() {
   return (
     <>
       <Filter onChange={handleFilterChange} />
-      <FilteredCountries filter={filter} countryData={countryData}/>
+      <FilteredCountries filter={filter} countryData={countryData} setFilter={setFilter}/>
     </>
   )
 }
