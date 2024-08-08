@@ -10,6 +10,30 @@ const FilteredCountries = ({filter, countryData}) => {
   if (!countryData) return
   if (!filter) return "Too many matches specify another filter"
 
+  let countryList = []
+  Object.keys(countryData).forEach((key, index) => {
+    if (key.toLowerCase().includes(filter.toLowerCase())) countryList.push(countryData[key])
+  })
+  if (countryList.length === 1) {
+
+    const country = countryList[0]
+    return <div>
+      <h3>{country.name.common}</h3>
+      capital: {country.capital[0]}
+      <br />
+      area: {country.area}
+
+      <h3>languages:</h3>
+      <ul>
+        {Object.values(country.languages).map(lang => <li>{lang}</li>)}
+      </ul>
+      <img src={country.flags.png} />
+    </div>
+  }
+  return <div>
+    {countryList.map(c => <p key={c.name.common}>{c.name.common}</p>)}
+  </div>
+
 }
 
 function App() {
