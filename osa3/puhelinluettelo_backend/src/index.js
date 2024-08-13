@@ -1,4 +1,5 @@
 const express = require('express')
+
 const app = express()
 let persons = [{
     id: "1",
@@ -33,8 +34,19 @@ app.get('/api/persons/:id', (request, response) => {
   response.send(person)
 })
 
+app.delete('/api/persons/:id', (request, response) => {
+  const id = request.params.id
+  const person = persons.find(value => value.id == id)
+  persons = persons.filter(p => p.id !== person.id)
+  response.sendStatus(200)
+})
 
-
+app.post('/api/persons/', (request, response) => {
+  const id = Math.floor(Math.random() * 10000000000)
+  const person = { id: id, name: request.query.name, number: request.query.number }
+  console.log(person)
+  response.send()
+})
 
 app.get('/api/info', (request, response) => {
   const datetime = new Date()
