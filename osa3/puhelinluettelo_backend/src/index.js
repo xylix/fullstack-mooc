@@ -23,6 +23,18 @@ app.get('/api/persons', (request, response) => {
   response.send(persons)
 })
 
+app.get('/api/persons/:id', (request, response) => {
+  const id = request.params.id
+  const person = persons.find(value => value.id == id)
+  if (!person) {
+    response.sendStatus(404)
+    return
+  }
+  response.send(person)
+})
+
+
+
 
 app.get('/api/info', (request, response) => {
   const datetime = new Date()
