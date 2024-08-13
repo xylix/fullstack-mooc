@@ -42,8 +42,19 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons/', (request, response) => {
+  const name = request.query.name
+  const number = request.query.name
+  if (!name || !number) {
+    response.status(400).send("Must have both name and number")
+    return
+  }
+  if (persons.find(p => p.name === name)) {
+    response.status(409).send("Name already exists")
+    return
+  }
   const id = Math.floor(Math.random() * 10000000000)
-  const person = { id: id, name: request.query.name, number: request.query.number }
+  const person = { id: id, name: name, number: number }
+  persons.push(person)
   console.log(person)
   response.send()
 })
