@@ -2,7 +2,8 @@ const express = require('express')
 const morgan = require('morgan')
 
 const app = express()
-const logger = morgan('combined')
+const logger = morgan(':method :post_data')
+morgan.token('post_data', function (req, res) { return JSON.stringify(req.query) })
 app.use(logger)
 
 let persons = [{
