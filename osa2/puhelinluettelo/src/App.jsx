@@ -54,7 +54,9 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    getPersons().then(fetchedPersons => setPersons(fetchedPersons))
+    getPersons().then(fetchedPersons => {
+      setPersons(fetchedPersons)
+    })
   }, [])
 
 
@@ -63,12 +65,13 @@ const App = () => {
     const oldPerson = persons.find(p => p.name === newName)
     if (oldPerson && oldPerson.name) {
       if (window.confirm(`Update phone number for ${oldPerson.name}?`)) {
+        // FIXME: if you add a person and then without refreshing try to update them the UI is in a state where it doesn't work
         oldPerson['number'] = newNumber
-        updatePerson(oldPerson)
+        updatePerson(oldPerson).catch(e => console.log(`Could not update person due to ${e}`))
         setNotificationMessage(`Updated number of ${oldPerson.name} to ${newNumber}`)
         setTimeout(() => setNotificationMessage(null), 3000)
-        setNewName()
-        setNewNumber('')
+        // setNewName()
+        // setNewNumber('')
         return
       } else {
         return
@@ -84,8 +87,8 @@ const App = () => {
       setTimeout(() => setNotificationMessage(null), 3000)
     })
 
-    setNewName('')
-    setNewNumber('')
+    // setNewName('')
+    // setNewNumber('')
     // console.log(persons)
   }
 
@@ -100,6 +103,7 @@ const App = () => {
     setFilter(event.target.value)
   }
   const handleDelete = (person) => {
+    event.preventDefault()
     if (window.confirm(`Delete ${person.name}?`)) {
       deletePerson(person.id).then(() => {
         console.log("setting delete notif message")
