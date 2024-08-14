@@ -1,6 +1,10 @@
 const express = require('express')
+const morgan = require('morgan')
 
 const app = express()
+const logger = morgan('combined')
+app.use(logger)
+
 let persons = [{
     id: "1",
     name: "Arto Hellas",
