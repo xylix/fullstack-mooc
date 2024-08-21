@@ -1,7 +1,7 @@
 import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
-import { createPerson, getPersons } from './mongo_connection.js'
+import { createPerson, getPersons, deletePerson } from './mongo_connection.js'
 
 const app = express()
 const logger = morgan(':method :post_data')
@@ -12,11 +12,11 @@ app.use(express.json())
 
 
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
   getPersons().then(persons => response.send(persons))
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   const person = persons.find(value => value.id == id)
   if (!person) {
@@ -26,14 +26,15 @@ app.get('/api/persons/:id', (request, response) => {
   response.send(person)
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
-  const person = persons.find(value => value.id == id)
+  deletePerson(id).then(() => response.sendStatus(200))
+  /* const person = persons.find(value => value.id == id)
   persons = persons.filter(p => p.id !== person.id)
-  response.sendStatus(200)
+  response.sendStatus(200) */
 })
 
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   console.log(id)
   const name = request.body["name"]
@@ -56,7 +57,7 @@ app.put('/api/persons/:id', (request, response) => {
   response.sendStatus(200)
 })
 
-app.post('/api/persons/', (request, response) => {
+app.post('/api/persons/', (request, response, next) => {
   const name = request.body["name"]
   const number = request.body["number"]
   if (name === undefined || number === undefined) {
@@ -76,13 +77,25 @@ app.post('/api/persons/', (request, response) => {
   })
 })
 
-app.get('/api/info', (request, response) => {
+app.get('/api/info', (request, response, next) => {
   const datetime = new Date()
   const content = `Phonebook has info for ${persons.length} people. \n ${datetime.toString()}`
   response.send(content)
 })
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+  next(error)
+}
+
+app.use(errorHandler)
+
 const PORT = 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
+
+

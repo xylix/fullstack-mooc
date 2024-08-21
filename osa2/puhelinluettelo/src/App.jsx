@@ -99,13 +99,15 @@ const App = () => {
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value)
   }
+
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
   }
+
   const handleDelete = (person) => {
     event.preventDefault()
-    if (window.confirm(`Delete ${person.name}?`)) {
-      deletePerson(person.id).then(() => {
+    if (window.confirm(`Delete ${person.name} with id ${person._id}?`)) {
+      deletePerson(person._id).then(() => {
         console.log("setting delete notif message")
         setNotificationMessage(`Deleted ${person.name}`)
         setTimeout(() => setNotificationMessage(null), 3000)
@@ -113,7 +115,7 @@ const App = () => {
         setErrorMessage(`Information of ${person.name} has been removed from the server`)
         setTimeout(() => setErrorMessage(null), 3000)
       })
-      setPersons(persons.filter(p => p.id !== person.id))
+      setPersons(persons.filter(p => p._id !== person._id))
     }
   }
   const personsToShow = persons.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()))

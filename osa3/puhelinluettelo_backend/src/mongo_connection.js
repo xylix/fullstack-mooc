@@ -12,6 +12,7 @@ mongoose.connect(url)
 
 export const getPersons = () => {
   return Contact.find({}).then(result => {
+    console.log(`fetched persons ${result} from mongodb`)
     // mongoose.connection.close()
     return result
   })
@@ -20,6 +21,12 @@ export const getPersons = () => {
 export const createPerson = (person) => {
   const contact = new Contact(person)
   return contact.save().then(() => {
-    console.log(`saved ${person} to the db`)
+    console.log(`saved ${JSON.stringify(person)} to the db`)
+  })
+}
+
+export const deletePerson = (id) => {
+  return Contact.deleteOne({_id: id}).then(() => {
+    console.log(`deleted person ${id} from the db`)
   })
 }
