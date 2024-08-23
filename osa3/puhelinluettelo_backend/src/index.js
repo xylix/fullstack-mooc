@@ -1,7 +1,7 @@
 import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
-import { createPerson, getPersons, deletePerson, updatePerson } from './mongo_connection.js'
+import { createPerson, getPersons, getPerson, deletePerson, updatePerson } from './mongo_connection.js'
 
 const app = express()
 const logger = morgan(':method :post_data')
@@ -10,20 +10,18 @@ app.use(logger)
 app.use(cors())
 app.use(express.json())
 
-
+app.get('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id
+  getPerson(id).then((person) => {
+    console.log(`fetched person ${person}`)
+    response.send(person)
+  }).catch((err) => {
+    next(err)
+  })
+})
 
 app.get('/api/persons', (request, response, next) => {
   getPersons().then(persons => response.send(persons))
-})
-
-app.get('/api/persons/:id', (request, response, next) => {
-  const id = request.params.id
-  const person = persons.find(value => value.id == id)
-  if (!person) {
-    response.sendStatus(404)
-    return
-  }
-  response.send(person)
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {

@@ -32,6 +32,13 @@ export const getPersons = () => {
   })
 }
 
+export const getPerson = (id) => {
+  return Contact.find({_id: id}).then(result => {
+    console.log(`fetched person ${result} from mongodb`)
+    return result
+  })
+}
+
 export const createPerson = (person) => {
   const contact = new Contact(person)
   return contact.save().then(() => {
