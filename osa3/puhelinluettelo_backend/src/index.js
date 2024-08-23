@@ -5,6 +5,7 @@ import { createPerson, getPersons, getPerson, deletePerson, updatePerson } from 
 
 const app = express()
 const logger = morgan(':method :post_data')
+// eslint-disable-next-line no-unused-vars
 morgan.token('post_data', function (req, res) { return JSON.stringify(req.body) })
 app.use(logger)
 app.use(cors())
@@ -21,7 +22,9 @@ app.get('/api/persons/:id', (request, response, next) => {
 })
 
 app.get('/api/persons', (request, response, next) => {
-  getPersons().then(persons => response.send(persons))
+  getPersons()
+    .then(persons => response.send(persons))
+    .catch(err => next(err))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -37,8 +40,8 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.put('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   console.log(id)
-  const name = request.body["name"]
-  const number = request.body["number"]
+  const name = request.body['name']
+  const number = request.body['number']
 
   const person = {
     name: name,
@@ -52,12 +55,12 @@ app.put('/api/persons/:id', (request, response, next) => {
 })
 
 app.post('/api/persons/', (request, response, next) => {
-  const name = request.body["name"]
-  const number = request.body["number"]
+  const name = request.body['name']
+  const number = request.body['number']
 
   getPersons().then((persons) => {
-    if (persons.find(p => p.name === name)) {
-      response.status(409).send("Name already exists")
+    if (persons.find(p => p.name === name)) {
+      response.status(409).send('Name already exists')
       return
     }
     const id = String(Math.floor(Math.random() * 10000000000))
@@ -70,9 +73,11 @@ app.post('/api/persons/', (request, response, next) => {
 })
 
 app.get('/api/info', (request, response, next) => {
-  const datetime = new Date()
-  const content = `Phonebook has info for ${persons.length} people. \n ${datetime.toString()}`
-  response.send(content)
+  getPersons().then((persons) => {
+    const datetime = new Date()
+    const content = `Phonebook has info for ${persons.length} people. \n ${datetime.toString()}`
+    response.send(content)
+  }).catch(err => next(err))
 })
 
 const errorHandler = (error, request, response, next) => {
