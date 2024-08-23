@@ -60,10 +60,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons/', (request, response, next) => {
   const name = request.body["name"]
   const number = request.body["number"]
-  if (name === undefined || number === undefined) {
-    response.status(400).send("Must have both name and number")
-    return
-  }
+
   getPersons().then((persons) => {
     if (persons.find(p => p.name === name)) {
       response.status(409).send("Name already exists")
@@ -71,9 +68,10 @@ app.post('/api/persons/', (request, response, next) => {
     }
     const id = String(Math.floor(Math.random() * 10000000000))
     const person = { id: id, name: name, number: number }
-    createPerson(person)
-    console.log(person)
-    response.send()
+    createPerson(person).then(() => {
+      console.log(person)
+      response.send()
+    }).catch(err => next(err))
   })
 })
 
@@ -87,6 +85,8 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message)
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
   next(error)
 }

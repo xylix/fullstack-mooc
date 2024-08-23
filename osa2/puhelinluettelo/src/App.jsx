@@ -85,6 +85,9 @@ const App = () => {
     createPerson(personObject).then(() => {
       setNotificationMessage(`Created new person ${personObject.name}`)
       setTimeout(() => setNotificationMessage(null), 3000)
+    }).catch((err) => {
+      setErrorMessage(err.response.data.error)
+      setTimeout(() => setErrorMessage(null), 3000)
     })
 
     // setNewName('')

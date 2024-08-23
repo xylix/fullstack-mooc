@@ -4,8 +4,15 @@ import 'dotenv/config'
 const url = process.env.MONGODB_URI
 mongoose.set('strictQuery', false)
 const contactSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    required: true,
+    minlength: 4
+  },
+  number: {
+    type: String,
+    required: true
+  },
 })
 const Contact = mongoose.model('Contact', contactSchema)
 mongoose.connect(url)
