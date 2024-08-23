@@ -22,7 +22,7 @@ const deletePerson = (id) => {
 }
 
 const updatePerson = (personObject) => {
-  const request = axios.put(baseUrl + '/'+  personObject.id, personObject)
+  const request = axios.put(baseUrl + '/'+  personObject._id, personObject)
   return request.then(response => {
     console.log(response)
   })

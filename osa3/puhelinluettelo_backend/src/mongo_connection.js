@@ -39,6 +39,17 @@ export const createPerson = (person) => {
   })
 }
 
+export const updatePerson = (person) => {
+  console.log(person)
+  return Contact.findByIdAndUpdate(
+    {_id: person._id},
+    { name: person.name, number: person.number},
+    { new: true, runValidators: true, context: 'query' }
+  ).then(() => {
+    console.log(`updated person ${person._id} in the db`)
+  })
+}
+
 export const deletePerson = (id) => {
   return Contact.deleteOne({_id: id}).then(() => {
     console.log(`deleted person ${id} from the db`)

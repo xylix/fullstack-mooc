@@ -67,9 +67,16 @@ const App = () => {
       if (window.confirm(`Update phone number for ${oldPerson.name}?`)) {
         // FIXME: if you add a person and then without refreshing try to update them the UI is in a state where it doesn't work
         oldPerson['number'] = newNumber
-        updatePerson(oldPerson).catch(e => console.log(`Could not update person due to ${e}`))
-        setNotificationMessage(`Updated number of ${oldPerson.name} to ${newNumber}`)
-        setTimeout(() => setNotificationMessage(null), 3000)
+        updatePerson(oldPerson)
+          .then(() => {
+            setNotificationMessage(`Updated number of ${oldPerson.name} to ${newNumber}`)
+            setTimeout(() => setNotificationMessage(null), 3000)
+          })
+          .catch(e => {
+            console.log(`Could not update person due to ${e}`)
+            setErrorMessage(`Could not update person due to ${e.response.data.error}`)
+            setTimeout(() => setNotificationMessage(null), 3000)
+          })
         // setNewName()
         // setNewNumber('')
         return

@@ -1,7 +1,7 @@
 import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
-import { createPerson, getPersons, deletePerson } from './mongo_connection.js'
+import { createPerson, getPersons, deletePerson, updatePerson } from './mongo_connection.js'
 
 const app = express()
 const logger = morgan(':method :post_data')
@@ -28,7 +28,9 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
-  deletePerson(id).then(() => response.sendStatus(200))
+  deletePerson(id)
+    .then(() => response.sendStatus(200))
+    .catch((err) => next(err))
   /* const person = persons.find(value => value.id == id)
   persons = persons.filter(p => p.id !== person.id)
   response.sendStatus(200) */
@@ -39,22 +41,16 @@ app.put('/api/persons/:id', (request, response, next) => {
   console.log(id)
   const name = request.body["name"]
   const number = request.body["number"]
-  const existing = persons.find(p => p.id === id)
-  if (!existing) {
-    console.error(`Attempted to update ${JSON.stringify(id)}`)
 
-    console.debug(existing)
-    response.status(400).send("Person must exist to update")
-    console.debug(`Existing persons: ${JSON.stringify(persons)}`)
-    return
+  const person = {
+    name: name,
+    number: number,
+    _id: id
   }
-  const personIndex = persons.findIndex(value => value.id == id)
-  const person = persons[personIndex]
-  person.name = name
-  person.number = number
-  persons[personIndex] = person
-
-  response.sendStatus(200)
+  console.log(person)
+  updatePerson(person).then(() => {
+    response.sendStatus(200)
+  }).catch(err => next(err))
 })
 
 app.post('/api/persons/', (request, response, next) => {
