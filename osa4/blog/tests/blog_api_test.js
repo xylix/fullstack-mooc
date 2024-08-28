@@ -11,10 +11,12 @@ const initialBlogs = [
     author: "Testy Testperson",
     title: "Test blog 1",
     url: "http://test.com",
+    likes: 0
   }, {
     author: "Testy Testperson",
     title: "Test blog 2",
     url: "http://test.com",
+    likes: 0
   }
 ]
 
@@ -101,6 +103,24 @@ test('delete removes a blog', async () => {
   if (original.body.length - 1 !== updated.body.length) {
     throw new Error('DELETE did not remove a blog')
   }
+})
+
+test('put updates a blog', async () => {
+  const original = await api.get('/api/blogs')
+  const blog = original.body[0]
+  blog.likes = blog.likes + 1
+  await api
+    .put(`/api/blogs/${blog.id}`)
+    .send(blog)
+    .expect(200)
+  await api
+    .get(`/api/blogs/${blog.id}`)
+    .expect(200)
+    .expect(response => {
+      if (response.body.likes !== blog.likes) {
+        throw new Error('PUT did not update a blog')
+      }
+    })
 })
 
 
