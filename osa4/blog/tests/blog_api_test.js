@@ -4,24 +4,26 @@ const supertest = require('supertest')
 const app = require('../app')
 
 const api = supertest(app)
-const Note = require('../models/blog')
+const Blog = require('../models/blog')
 
-const initialNotes = [
+const initialBlogs = [
   {
-    content: 'HTML is easy',
-    important: false,
+    author: "Testy Testperson",
+    title: "Test blog 1",
+    url: "http://test.com",
   }, {
-    content: 'Browser can execute only JavaScript',
-    important: true,
+    author: "Testy Testperson",
+    title: "Test blog 2",
+    url: "http://test.com",
   }
 ]
 
 beforeEach(async () => {
-  await Note.deleteMany({})
-  let noteObject = new Note(initialNotes[0])
-  await noteObject.save()
-  noteObject = new Note(initialNotes[1])
-  await noteObject.save()
+  await Blog.deleteMany({})
+  let blogObject = new Blog(initialBlogs[0])
+  await blogObject.save()
+  blogObject = new Blog(initialBlogs[1])
+  await blogObject.save()
 })
 
 test('correct amount of blogs is returned', async () => {
@@ -47,8 +49,15 @@ test('blog id is named `id`', async () => {
 })
 
 test('POST adds a new blog`', async () => {
+  const blog = {
+    author: 'Testy Testperson',
+    title: 'test',
+    url: 'http://test.com',
+  }
   const original = await api.get('/api/blogs')
-  await api.post('/api/blogs')
+  await api
+    .post('/api/blogs').send(blog)
+    .expect(201)
   const updated = await api.get('/api/blogs')
   if (original.body.length + 1 !== updated.body.length) {
     throw new Error('POST did not add a new blog')
@@ -57,12 +66,13 @@ test('POST adds a new blog`', async () => {
 
 test('if likes is not given, it is set to 0', async () => {
   const blog = {
-    title: 'test',
     author: 'Testy Testperson',
+    title: 'test',
     url: 'http://test.com'
   }
   await api
-    .post('/api/blogs', blog)
+    .post('/api/blogs')
+    .send(blog)
     .expect(201)
     .expect(response => {
       console.log(response.body)
@@ -74,8 +84,8 @@ test('if likes is not given, it is set to 0', async () => {
 
 test('if title or url is missing, return 400', async () => {
   const blog = {
-    likes: 0,
     author: "Testy Testperson",
+    likes: 0,
   }
   await api
     .post('/api/blogs', blog)
