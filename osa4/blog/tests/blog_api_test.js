@@ -82,6 +82,17 @@ test('if title or url is missing, return 400', async () => {
     .expect(400)
 })
 
+test('delete removes a blog', async () => {
+  const original = await api.get('/api/blogs')
+  await api
+    .delete(`/api/blogs/${original.body[0].id}`)
+    .expect(204)
+  const updated = await api.get('/api/blogs')
+  if (original.body.length - 1 !== updated.body.length) {
+    throw new Error('DELETE did not remove a blog')
+  }
+})
+
 
 after(async () => {
   await mongoose.connection.close()
