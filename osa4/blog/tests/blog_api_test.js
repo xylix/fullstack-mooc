@@ -1,24 +1,13 @@
 const { test, after, beforeEach } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const app = require('../app')
 
+const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const helper = require('./test_helper')
 
-const initialBlogs = [
-  {
-    author: "Testy Testperson",
-    title: "Test blog 1",
-    url: "http://test.com",
-    likes: 0
-  }, {
-    author: "Testy Testperson",
-    title: "Test blog 2",
-    url: "http://test.com",
-    likes: 0
-  }
-]
+const initialBlogs = helper.initialBlogs
 
 beforeEach(async () => {
   await Blog.deleteMany({})
