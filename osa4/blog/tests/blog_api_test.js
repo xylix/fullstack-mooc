@@ -58,6 +58,8 @@ test('POST adds a new blog`', async () => {
 test('if likes is not given, it is set to 0', async () => {
   const blog = {
     title: 'test',
+    author: 'Testy Testperson',
+    url: 'http://test.com'
   }
   await api
     .post('/api/blogs', blog)
@@ -69,6 +71,17 @@ test('if likes is not given, it is set to 0', async () => {
       }
     })
 })
+
+test('if title or url is missing, return 400', async () => {
+  const blog = {
+    likes: 0,
+    author: "Testy Testperson",
+  }
+  await api
+    .post('/api/blogs', blog)
+    .expect(400)
+})
+
 
 after(async () => {
   await mongoose.connection.close()
