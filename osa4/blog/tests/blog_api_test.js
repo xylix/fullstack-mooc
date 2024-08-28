@@ -22,7 +22,7 @@ test('blog id is named `id`', async () => {
     .get('/api/blogs')
     .expect(response => {
       if (!response.body[0].id) {
-        throw new Error(`id is not named 'id', response had fields ${JSON.stringify(Object.values(response.body[0]))}`)
+        throw new Error(`id is not named 'id', response had fields ${Object.keys(response.body[0])}`)
       }
     })
 })
