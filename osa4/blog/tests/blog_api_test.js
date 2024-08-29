@@ -11,21 +11,26 @@ const helper = require('./test_helper')
 
 const initialBlogs = helper.initialBlogs
 
-before(async () => {
-    await User.deleteMany({})
-
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new User({ username: 'root', passwordHash })
-
-    await user.save()
-})
-
 describe('when there is initially some blogs saved', () => {
+  before(async () => {
+      await User.deleteMany({})
+
+      const passwordHash = await bcrypt.hash('sekret', 10)
+      const user = new User({ username: 'root', passwordHash })
+
+      await user.save()
+      console.log(await User.findOne({}))
+  })
+
   beforeEach(async () => {
+    const user = await User.findOne({ username: 'root'})
+    console.log(JSON.stringify(user))
     await Blog.deleteMany({})
     let blogObject = new Blog(initialBlogs[0])
+    blogObject.user = user.id
     await blogObject.save()
     blogObject = new Blog(initialBlogs[1])
+    blogObject.user = user.id
     await blogObject.save()
   })
 
@@ -52,6 +57,7 @@ describe('when there is initially some blogs saved', () => {
   })
 
   test('POST adds a new blog`', async () => {
+    const token = await helper.login('root', 'sekret', api)
     /* FIXME: make work with authentication*/
     const blog = {
       author: 'Testy Testperson',
@@ -60,7 +66,9 @@ describe('when there is initially some blogs saved', () => {
     }
     const original = await api.get('/api/blogs')
     await api
-      .post('/api/blogs').send(blog)
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(blog)
       .expect(201)
     const updated = await api.get('/api/blogs')
     if (original.body.length + 1 !== updated.body.length) {
@@ -69,6 +77,7 @@ describe('when there is initially some blogs saved', () => {
   })
 
   test('if likes is not given, it is set to 0', async () => {
+    const token = await helper.login('root', 'sekret', api)
     const blog = {
       author: 'Testy Testperson',
       title: 'test',
@@ -76,6 +85,7 @@ describe('when there is initially some blogs saved', () => {
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(blog)
       .expect(201)
       .expect(response => {
@@ -87,19 +97,23 @@ describe('when there is initially some blogs saved', () => {
   })
 
   test('if title or url is missing, return 400', async () => {
+    const token = await helper.login('root', 'sekret', api)
     const blog = {
       author: "Testy Testperson",
       likes: 0,
     }
     await api
       .post('/api/blogs', blog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
   })
 
   test('delete removes a blog', async () => {
+    const token = await helper.login('root', 'sekret', api)
     const original = await api.get('/api/blogs')
     await api
       .delete(`/api/blogs/${original.body[0].id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
     const updated = await api.get('/api/blogs')
     if (original.body.length - 1 !== updated.body.length) {
@@ -110,11 +124,13 @@ describe('when there is initially some blogs saved', () => {
   test('put updates a blog', async () => {
     const original = await api.get('/api/blogs')
     const blog = original.body[0]
+    delete blog.user
     blog.likes = blog.likes + 1
     await api
       .put(`/api/blogs/${blog.id}`)
       .send(blog)
       .expect(200)
+
     await api
       .get(`/api/blogs/${blog.id}`)
       .expect(200)
@@ -124,8 +140,8 @@ describe('when there is initially some blogs saved', () => {
         }
       })
   })
+  after(async () => {
+    await mongoose.connection.close()
+  })
 })
 
-after(async () => {
-  await mongoose.connection.close()
-})

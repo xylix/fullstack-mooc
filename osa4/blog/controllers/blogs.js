@@ -8,6 +8,9 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
+  if (!request.user) {
+    return response.status(401).json({ error: 'unauthorized' })
+  }
   const user = await User.findById(request.user)
   if (!request.body.title || !request.body.url) {
     return response.status(400).json({ error: 'title or url missing' })
@@ -24,12 +27,15 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.get('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id)
+  const blog = await Blog.findById(request.params.id).populate('user')
   response.status(200).json(blog)
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
   const user = request.user
+  if (!user) {
+    return response.status(401).json({ error: 'unauthorized' })
+  }
   const blog = await Blog.findById(request.params.id)
   if (!blog) {
     return response.status(404).json({ error: 'blog not found' })

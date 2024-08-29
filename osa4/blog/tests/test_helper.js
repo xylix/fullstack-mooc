@@ -19,9 +19,22 @@ const usersInDb = async () => {
   return users.map(u => u.toJSON())
 }
 
+const login = async (username, password, api) => {
+  console.log('loggin in')
+  const response = await api
+    .post('/api/login')
+    .send({ username, password })
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  console.log(`returning token: ${response.body.token}`)
+  return response.body.token
+
+}
+
 module.exports = {
   initialBlogs,
   // nonExistingId,
   // blogsInDb,
   usersInDb,
+  login,
 }
