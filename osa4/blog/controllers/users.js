@@ -15,7 +15,6 @@ usersRouter.post('/', async (request, response) => {
     return response.status(400).json({ error: 'username must be unique' })
   }
 
-
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
@@ -31,7 +30,7 @@ usersRouter.post('/', async (request, response) => {
 })
 
 usersRouter.get('/', async (request, response) => {
-  const users = await User.find({})
+  const users = await User.find({}).populate('blogs')
   response.json(users)
 })
 
