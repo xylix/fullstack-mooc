@@ -52,6 +52,7 @@ describe('when there is initially some blogs saved', () => {
   })
 
   test('POST adds a new blog`', async () => {
+    /* FIXME: make work with authentication*/
     const blog = {
       author: 'Testy Testperson',
       title: 'test',
