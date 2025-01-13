@@ -7,7 +7,9 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newBlog, setNewBlog] = useState('')
+  const [newTitle, setTitle] = useState('')
+  const [newAuthor, setAuthor] = useState('')
+  const [newUrl, setUrl] = useState('')
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
@@ -25,7 +27,9 @@ const App = () => {
   const addBlog = (event) => {
     event.preventDefault()
     const blogObject = {
-      content: newBlog,
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl,
       important: Math.random() > 0.5,
     }
 
@@ -54,10 +58,6 @@ const App = () => {
           setErrorMessage(null)
         }, 5000)
       })
-  }
-
-  const handleBlogChange = (event) => {
-    setNewBlog(event.target.value)
   }
 
   const handleLogin = async (event) => {
@@ -110,10 +110,12 @@ const App = () => {
 
   const blogForm = () => (
     <form onSubmit={addBlog}>
-      <input
-        value={newBlog}
-        onChange={handleBlogChange}
-      />
+      title: <input value={newTitle} onChange={({target}) => setTitle(target.value)} />
+      <br/>
+      author: <input value={newAuthor} onChange={({target}) => setAuthor(target.value)} />
+      <br/>
+      url: <input value={newUrl} onChange={({target}) => setUrl(target.value)} />
+      <br/>
       <button type="submit">save</button>
     </form>
   )
