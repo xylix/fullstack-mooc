@@ -11,7 +11,7 @@ const App = () => {
   const [newAuthor, setAuthor] = useState('')
   const [newUrl, setUrl] = useState('')
   const [showAll, setShowAll] = useState(true)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notificationMessage, setNotificationMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -33,7 +33,7 @@ const App = () => {
       }
     }, [])
 
-  const addBlog = (event) => {
+  const addBlog = async (event) => {
     event.preventDefault()
     const blogObject = {
       title: newTitle,
@@ -42,12 +42,21 @@ const App = () => {
       important: Math.random() > 0.5,
     }
 
-    blogService
+    await blogService
       .create(blogObject)
         .then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
-        setNewBlog('')
+        setTitle('')
+        setAuthor('')
+        setUrl('')
       })
+    setNotificationMessage(
+        `Blog '${blogObject.title} by ${blogObject.author}' created`
+    )
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 5000)
+
   }
 
   const toggleImportanceOf = id => {
@@ -60,11 +69,11 @@ const App = () => {
         setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
       })
       .catch(error => {
-        setErrorMessage(
+        setNotificationMessage(
           `Blog '${blog.content}' was already removed from server`
         )
         setTimeout(() => {
-          setErrorMessage(null)
+          setNotificationMessage(null)
         }, 5000)
       })
   }
@@ -88,10 +97,10 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('wrong credentials')
+      setNotificationMessage('wrong credentials')
       console.error(exception)
       setTimeout(() => {
-        setErrorMessage(null)
+        setNotificationMessage(null)
       }, 5000)
     }
   }
@@ -139,7 +148,7 @@ const App = () => {
   return (
     <div>
       <h1>Blogs</h1>
-      <Notification message={errorMessage} />
+      <Notification message={notificationMessage} />
 
       {!user && loginForm()}
       {user && <div>
