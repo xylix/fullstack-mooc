@@ -67,11 +67,13 @@ const App = () => {
       const user = await loginService.login({
         username, password,
       })
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
       setErrorMessage('wrong credentials')
+      console.error(exception)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
